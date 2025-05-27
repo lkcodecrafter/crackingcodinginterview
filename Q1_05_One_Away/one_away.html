@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>README - One Away Problem</title>
+  <!-- Lalit Kumar -->
+  <!-- Highlight.js CSS -->
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/styles/github-dark.min.css"
+  />
+
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+        Oxygen, Ubuntu, Cantarell, "Open Sans", "Helvetica Neue", sans-serif;
+      max-width: 900px;
+      margin: 40px auto;
+      padding: 0 20px;
+      background: #f5f5f5;
+      color: #333;
+      line-height: 1.6;
+    }
+
+    #readme {
+      background: white;
+      padding: 25px 30px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgb(0 0 0 / 0.1);
+    }
+
+    h1, h2, h3, h4 {
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 6px;
+      margin-top: 1.5em;
+    }
+
+    pre {
+      background: #2d2d2d;
+      color: #ccc;
+      padding: 15px;
+      border-radius: 5px;
+      overflow-x: auto;
+      font-size: 14px;
+    }
+
+    code {
+      font-family: "Fira Code", Consolas, Monaco, "Courier New", monospace;
+      font-size: 14px;
+    }
+
+    table {
+      border-collapse: collapse;
+      margin: 15px 0;
+      width: 100%;
+    }
+
+    table, th, td {
+      border: 1px solid #ddd;
+    }
+
+    th, td {
+      padding: 10px 12px;
+      text-align: left;
+    }
+
+    th {
+      background-color: #f0f0f0;
+    }
+
+    hr {
+      border: none;
+      border-top: 1px solid #ddd;
+      margin: 2em 0;
+    }
+
+    a {
+      color: #0366d6;
+      text-decoration: none;
+    }
+
+    a:hover {
+      text-decoration: underline;
+    }
+  </style>
+</head>
+<body>
+
+  <div id="readme">Loading README...</div>
+
+  <!-- marked.js to convert markdown -->
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+  <!-- highlight.js for code highlight -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.8.0/highlight.min.js"></script>
+
+  <script>
+    const readmeMarkdown = `
+# 📝 One Away
+
+## 🔍 Problem Statement
+
+There are **three types of edits** that can be performed on strings:
+
+- ➕ Insert a character  
+- ➖ Remove a character  
+- 🔄 Replace a character  
+
+Write a function to check if two strings are **one edit (or zero edits) away**.
+
+---
+
+## ✅ Examples
+
+| Input         | Output  |
+|---------------|---------|
+| pale, ple     | ✔️ true  |
+| pales, pale   | ✔️ true  |
+| pale, bale    | ✔️ true  |
+| pale, bae     | ❌ false |
+
+---
+
+## 🧠 Approach
+
+### Step-by-step Logic
+
+1. **Check the length difference**:  
+   - If \`|length1 - length2| > 1\`, return ❌ \`false\`.
+
+2. **If lengths are the same (Check for replacement)**:  
+   - Compare characters at each position.  
+   - If more than one character differs, return ❌ \`false\`.
+
+3. **If length differs by 1 (Insert or Remove)**:  
+   - Identify shorter and longer string.  
+   - Use two pointers to compare characters.  
+   - Allow at most one skip in the longer string.
+
+4. **If strings are identical**, return ✔️ \`true\`.
+
+---
+
+## 💻 Java Solution
+
+\`\`\`java
+public class OneAway {
+
+    public static boolean oneAway(String first, String second) {
+        if (Math.abs(first.length() - second.length()) > 1) {
+            return false;
+        }
+
+        if (first.length() == second.length()) {
+            return checkReplace(first, second);
+        }
+
+        if (first.length() < second.length()) {
+            return checkInsert(first, second);
+        } else {
+            return checkInsert(second, first);
+        }
+    }
+
+    private static boolean checkReplace(String s1, String s2) {
+        boolean foundDifference = false;
+        for (int i = 0; i < s1.length(); i++) {
+            if (s1.charAt(i) != s2.charAt(i)) {
+                if (foundDifference) {
+                    return false;
+                }
+                foundDifference = true;
+            }
+        }
+        return true;
+    }
+
+    private static boolean checkInsert(String shorter, String longer) {
+        int index1 = 0, index2 = 0;
+        boolean foundDifference = false;
+
+        while (index1 < shorter.length() && index2 < longer.length()) {
+            if (shorter.charAt(index1) != longer.charAt(index2)) {
+                if (foundDifference) {
+                    return false;
+                }
+                foundDifference = true;
+                index2++; // Skip a character in longer string
+            } else {
+                index1++;
+                index2++;
+            }
+        }
+        return true;
+    }
+
+    public static void main(String[] args) {
+        System.out.println(oneAway("pale", "ple"));   // true
+        System.out.println(oneAway("pales", "pale")); // true
+        System.out.println(oneAway("pale", "bale"));  // true
+        System.out.println(oneAway("pale", "bae"));   // false
+    }
+}
+\`\`\`
+
+---
+
+## 🏃 Dry Run Example: \`pale\` vs \`ple\`
+
+| i (shorter) | j (longer) | Characters  | Action                              |
+|-------------|------------|-------------|-----------------------------------|
+| 0           | 0          | p == p      | Move both pointers                 |
+| 1           | 1          | l != a      | First mismatch: skip longer (j++) |
+| 1           | 2          | l == l      | Move both pointers                 |
+| 2           | 3          | e == e      | Move both pointers                 |
+
+✔️ Only one mismatch found → return \`true\`.
+
+---
+
+## ⏱️ Complexity
+
+- **Time Complexity:** O(N), where N = length of shorter string.  
+- **Space Complexity:** O(1) — constant extra space.
+`;
+
+    // Render markdown with code highlighting
+    const html = marked.parse(readmeMarkdown, {
+      highlight: function (code, lang) {
+        if (lang && hljs.getLanguage(lang)) {
+          return hljs.highlight(code, { language: lang }).value;
+        }
+        return hljs.highlightAuto(code).value;
+      }
+    });
+
+    const readmeDiv = document.getElementById('readme');
+    readmeDiv.innerHTML = html;
+
+    // Highlight all code blocks
+    document.querySelectorAll('pre code').forEach((block) => {
+      hljs.highlightElement(block);
+    });
+  </script>
+
+</body>
+</html>
